@@ -1,5 +1,5 @@
 //Numbers
-const sum = (a, b) => a+b;
+const sum = (a, b) => a + b;
 
 //Strings
 const greeting = (name) => `Hello ${name}`;
@@ -14,14 +14,38 @@ const greeting = (name) => `Hello ${name}`;
 //refactored version
 const isEven = (number) => number % 2 === 0;
 
-
 //Array
-const animals = ['cat', 'dog', 'cow', 'sheep', 'goat']; 
+const animals = ["cat", "dog", "cow", "sheep", "goat"];
 
+//Objects
+const getOrderById = (id) => {
+    if (!id){
+        throw new Error('id is not defined')
+    }
+  const orders = [
+    {
+      id: 1,
+      item: "apple",
+      quantity: 3,
+      price: 1.5,
+    },
+    { id: 2, item: "banana", quantity: 2, price: 0.5 },
+    { id: 3, item: "orange", quantity: 5, price: 1.0 },
+  ];
+  if(!id) {
+    throw new Error('id is not defined')
+  }
+  const order = orders.find((order) => order.id === id);
+  if(!order) {
+    throw new Error('Order not found')
+  }
+  return order;
+};
 
 module.exports = {
-    sum,
-    greeting,
-    isEven,
-    animals
-}
+  sum,
+  greeting,
+  isEven,
+  animals,
+  getOrderById,
+};
