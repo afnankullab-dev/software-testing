@@ -1,4 +1,6 @@
-const { sum, greeting, isEven, animals, getOrderById } = require("./utils");
+const { sum, greeting, isEven, animals, getOrderById, getOrders, applyDiscount } = require("./utils");
+
+const db = require('./db');
 
 describe("sum", () => {
   it("should return 2 + 3 = 5", () => {
@@ -75,3 +77,32 @@ describe('getOrderById', () => {
         expect(() => getOrderById(4)).toThrow('Order not found');
     })
 })
+
+describe('getOrders', () => {
+    it('should return an array of orders', async () => {
+      const orders = await getOrders();
+      expect(orders.length).toBe(3);
+      // expect((await getOrders()).length).toBe(3) would also work
+      
+      //toContainEqual checks if an array contains an object with the same properties and values as the expected object.
+       await expect(getOrders()).resolves.toContainEqual({id: 1, price: 10})
+    
+    });
+  });
+
+describe('applyDiscount', () => {
+    it('should apply a discount of 10% if the order price is greater than 10', () => {
+      //overide without jest.mock, difficult to manage for other calls
+      db.getOrder = function(OrderId) {
+        return {id: OrderId, price: 100};
+      }
+      const order = applyDiscount(1);
+      expect(order.price).toBe(90);
+
+      //Why jest mock
+      const myFunc = jest.fn();
+      myFunc.mockReturnValueOnce(10).mockReturnValue(20);
+      console.log(myFunc(), myFunc(), myFunc()); // 10, 20, 20
+    })
+  })
+    
