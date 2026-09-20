@@ -1,3 +1,4 @@
+const axios = require('axios');
 const db = require('./db');
 
 //Numbers
@@ -58,9 +59,17 @@ const applyDiscount = (orderId) => {
 
   if(order.price > 10){
     order.price = order.price * 0.9;
+    db.updateOrder(order);
   }
 
   return order;
+}
+
+
+const fetchData = async () => {
+  const data = axios.get('https://url.com')
+  // operations
+  return data;
 }
 
 
@@ -72,4 +81,5 @@ module.exports = {
   getOrderById,
   getOrders,
   applyDiscount,
+  fetchData,
 };

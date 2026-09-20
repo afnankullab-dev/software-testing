@@ -1,6 +1,18 @@
-const { sum, greeting, isEven, animals, getOrderById, getOrders, applyDiscount } = require("./utils");
+const axios = require('axios');
+const 
+{ sum, 
+  greeting, 
+  isEven, 
+  animals, 
+  getOrderById, 
+  getOrders, 
+  applyDiscount, 
+  fetchData } = require("./utils");
 
 const db = require('./db');
+
+//mocking axios module
+jest.mock('axios');
 
 describe("sum", () => {
   it("should return 2 + 3 = 5", () => {
@@ -92,17 +104,39 @@ describe('getOrders', () => {
 
 describe('applyDiscount', () => {
     it('should apply a discount of 10% if the order price is greater than 10', () => {
-      //overide without jest.mock, difficult to manage for other calls
-      db.getOrder = function(OrderId) {
-        return {id: OrderId, price: 100};
-      }
+      db.getOrder = jest.fn().mockReturnValue({id: 1, price: 100});
+      db.getOrder = jest.fn().mockImplementation((id) => {
+        if (id < 5) {
+          return {id: id, price: 100};
+        }
+        return {id: id, price: 5};
+      });
+      db.updateOrder = jest.fn(); //It returns undefined by default., WE JUST USED THIs as mock to watch if it was called and with what arguments, we don't care about the return value in this case.
       const order = applyDiscount(1);
       expect(order.price).toBe(90);
+      expect(db.updateOrder.mock.calls[0][0]).toEqual({id: 1, price: 90});
+      
+      //mock object
+      console.log(db.getOrder.mock)
 
-      //Why jest mock
-      const myFunc = jest.fn();
-      myFunc.mockReturnValueOnce(10).mockReturnValue(20);
-      console.log(myFunc(), myFunc(), myFunc()); // 10, 20, 20
+      //mock calls array
+      expect(db.getOrder.mock.calls.length).toBe(1);
+      expect(db.getOrder.mock.calls[0][0]).toBe(1); //what was the first argument of the first call
+      expect(db.updateOrder).toHaveBeenCalled(); // calledWith is more specific than toHaveBeenCalled, it checks the arguments of the call as well.
+      //mock reset
+      //db.getOrder.mockReset(); //this reset the function to undefined, so we need to mock it again
+    })
+
+    it('should not apply a discount if the order price is less than or equal to 10', () => {
+      expect(applyDiscount(6)).toHaveProperty('price', 5);
+    })
+  })
+
+  describe('fetchData', () => {
+    it('should fetch data from the API', async () => {
+      axios.get.mockResolvedValue({ id:5 });
+      const data = await fetchData();
+      expect(data).toEqual({ id:5 });
     })
   })
     
